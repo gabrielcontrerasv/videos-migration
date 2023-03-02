@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from database import updateLinks
 
 # Carga las variables de entorno desde el archivo .env
 load_dotenv()
@@ -38,7 +39,7 @@ blob_service_client = BlobServiceClient.from_connection_string(os.getenv('AZURE_
 
 # Definimos el nombre del contenedor de Blob Storage donde queremos almacenar los archivos
 container_name = os.getenv('AZURE_STORAGE_CONTAINER_NAME')
-
+blob_urls = []
 # Iteramos sobre cada URL en el archivo de Excel
 for url in df['Mgmeet record']:
     # Abrimos la URL en el navegador
@@ -48,26 +49,38 @@ for url in df['Mgmeet record']:
     download_button = WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'i.recordingDownload[title="Descargar"]')))
     print('descargando porfavor espere...')
     download_button.click()
-
     time.sleep(2)
 
     # Esperamos a que se descargue el archivo antes de continuar
     while True:
         if all(file.endswith('.mp4') for file in os.listdir(download_path)):
             break
-        time.sleep(1)
         print('Esperando a que se descargue el archivo...')
     print('subiendo a azureBlob...')
     # Subimos el archivo descargado a Azure Blob Storage
     for file in os.listdir(download_path):
-        if file.endswith('.mp4'):
-            blob_client = blob_service_client.get_blob_client(container=container_name, blob=file)
-            with open(os.path.join(download_path, file), "rb") as data:
-                print("ya estoy enviando paquetes")
-                blob_client.upload_blob(data, overwrite=True)
-                print("ya termine, eliminando...")
-            # Borramos el archivo descargado
+            blob_url = f"https://{os.getenv('AZURE_STORAGE_ACCOUNT')}.blob.core.windows.net/{container_name}/{file}"
+            blob_urls.append(blob_url)
+            print("ya estoy enviando paquetes")
+            cmd = '''az storage blob upload \
+            --account-name sagrabacionescursos \
+            --container-name videos \
+            --name "'''+file+'''" \
+            --file "clases/'''+file+'''" \
+            --overwrite \
+            --auth-mode login
+            '''
+            print(cmd)
+            os.system(cmd)
+            print("ya termine ...")
             os.remove(os.path.join(download_path, file))
-
+df = df.assign(new_url=blob_urls)
+# Nombre del archivo de Excel
+excel_file = 'resultado.xlsx'
+# Guardamos el DataFrame en el archivo de Excel
+df.to_excel(excel_file, index=False)
 # Cerramos el navegador
 driver.quit()
+print('actualizando base de datos')
+updateLinks(df)
+print('registros actualizados correctamente')
