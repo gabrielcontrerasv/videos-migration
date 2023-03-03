@@ -42,38 +42,43 @@ container_name = os.getenv('AZURE_STORAGE_CONTAINER_NAME')
 blob_urls = []
 # Iteramos sobre cada URL en el archivo de Excel
 for url in df['Mgmeet record']:
-    # Abrimos la URL en el navegador
-    driver.get(url)
-    time.sleep(2)
-    # Hacemos clic en el botón de descarga
-    download_button = WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'i.recordingDownload[title="Descargar"]')))
-    print('descargando porfavor espere...')
-    download_button.click()
-    time.sleep(2)
+    try:
+        # Abrimos la URL en el navegador
+        driver.get(url)
+        time.sleep(2)
+        # Hacemos clic en el botón de descarga
+        download_button = WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.recordingHeader i')))
+        print('descargando porfavor espere...')
+        download_button.click()
+        time.sleep(2)
 
-    # Esperamos a que se descargue el archivo antes de continuar
-    while True:
-        if all(file.endswith('.mp4') for file in os.listdir(download_path)):
-            break
-        print('Esperando a que se descargue el archivo...')
-    print('subiendo a azureBlob...')
-    # Subimos el archivo descargado a Azure Blob Storage
-    for file in os.listdir(download_path):
-            blob_url = f"https://{os.getenv('AZURE_STORAGE_ACCOUNT')}.blob.core.windows.net/{container_name}/{file}"
-            blob_urls.append(blob_url)
-            print("ya estoy enviando paquetes")
-            cmd = '''az storage blob upload \
-            --account-name sagrabacionescursos \
-            --container-name videos \
-            --name "'''+file+'''" \
-            --file "clases/'''+file+'''" \
-            --overwrite \
-            --auth-mode login
-            '''
-            print(cmd)
-            os.system(cmd)
-            print("ya termine ...")
-            os.remove(os.path.join(download_path, file))
+        # Esperamos a que se descargue el archivo antes de continuar
+        while True:
+            if all(file.endswith('.mp4') for file in os.listdir(download_path)):
+                break
+            print('Esperando a que se descargue el archivo...')
+        print('subiendo a azureBlob...')
+        # Subimos el archivo descargado a Azure Blob Storage
+        for file in os.listdir(download_path):
+                blob_url = f"https://{os.getenv('AZURE_STORAGE_ACCOUNT')}.blob.core.windows.net/{container_name}/{file}"
+                blob_urls.append(blob_url)
+                print("ya estoy enviando paquetes")
+                cmd = '''az storage blob upload \
+                --account-name sagrabacionescursos \
+                --container-name videos \
+                --name "'''+file+'''" \
+                --file "clases/'''+file+'''" \
+                --overwrite \
+                --auth-mode login
+                '''
+                print(cmd)
+                os.system(cmd)
+                print("ya termine ...")
+                os.remove(os.path.join(download_path, file))
+    except Exception as e:
+        print(f"Ocurrió un error en la descarga de la URL {url}: {str(e)}")
+        blob_urls.append('')
+        continue
 df = df.assign(new_url=blob_urls)
 # Nombre del archivo de Excel
 excel_file = 'resultado.xlsx'

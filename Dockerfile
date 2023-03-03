@@ -13,10 +13,10 @@ RUN apt-get update \
     && mv geckodriver /usr/local/bin/geckodriver \
     && chmod +x /usr/local/bin/geckodriver \
     && pip install --upgrade pip \
-    && pip install python-dotenv==0.21.1\
-    && pip install --no-cache-dir -r requirements.txt 
-
+    && pip install mysql-connector-python \
+    && pip install --no-cache-dir -r Requirements.txt 
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 COPY .env /app/.env
 RUN chmod -R 777 /app/clases
-CMD ["python", "descargar.py"]
+CMD ["python", "migration.py"]
 

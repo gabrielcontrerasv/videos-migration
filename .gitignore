@@ -1,2 +1,4 @@
 .env
 /clases
+.DS_Store
+geckodriver.log
