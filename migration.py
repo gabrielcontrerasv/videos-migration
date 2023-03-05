@@ -15,6 +15,8 @@ load_dotenv()
 
 # Accede a la variable de entorno CLASES_FILE
 clases = os.getenv('CLASES_FILE')
+sas = os.getenv('SAS')
+account = os.getenv('AZURE_STORAGE_ACCOUNT')
 
 # Obtenemos la ruta del directorio actual y concatenamos /clases
 download_path = os.path.join(os.getcwd(), 'clases')
@@ -63,15 +65,14 @@ for url in df['Mgmeet record']:
                 blob_url = f"https://{os.getenv('AZURE_STORAGE_ACCOUNT')}.blob.core.windows.net/{container_name}/{file}"
                 blob_urls.append(blob_url)
                 print("ya estoy enviando paquetes")
-                cmd = '''az storage blob upload \
-                --account-name sagrabacionescursos \
-                --container-name videos \
-                --name "'''+file+'''" \
-                --file "clases/'''+file+'''" \
+                cmd = f'''az storage blob upload \
+                --account-name {account} \
+                --container-name {container_name} \
+                --name "{file}" \
+                --file "clases/{file}" \
                 --overwrite \
-                --auth-mode login
+                --sas-token "{sas}"
                 '''
-                print(cmd)
                 os.system(cmd)
                 print("ya termine ...")
                 os.remove(os.path.join(download_path, file))
