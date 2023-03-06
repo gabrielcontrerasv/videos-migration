@@ -8,7 +8,7 @@
   git:
     repo: https://github.com/gabrielcontrerasv/MigrationWebex.git
     dest: /ruta/personalizada/MigrationWebex
-    version: master
+    version: migration
 
 - name: Instalación y configuración de dependencias
   hosts: all
