@@ -1,0 +1,72 @@
+---
+- hosts: all
+  become: true
+  vars:
+    workspace_dir: /home/Innova/Desktop/migration
+
+- name: Clonar repositorio
+  git:
+    repo: https://github.com/gabrielcontrerasv/MigrationWebex.git
+    dest: /ruta/personalizada/MigrationWebex
+    version: master
+
+- name: Instalación y configuración de dependencias
+  hosts: all
+  become: true
+  tasks:
+    - name: Actualizar el sistema operativo
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        upgrade: yes
+    - name: Instalar paquetes necesarios
+      apt:
+        name:
+          - wget
+          - gnupg2
+          - curl
+          - unzip
+          - libxi6
+          - libgconf-2-4
+          - libcurl4-openssl-dev
+          - firefox-esr
+        state: latest
+    - name: Descargar y configurar geckodriver
+      vars:
+        geckodriver_version: "{{ lookup('url', 'https://api.github.com/repos/mozilla/geckodriver/releases/latest') | from_json | json_query('tag_name') }}"
+      get_url:
+        url: "https://github.com/mozilla/geckodriver/releases/download/{{ geckodriver_version }}/geckodriver-{{ geckodriver_version }}-linux64.tar.gz"
+        dest: /tmp/geckodriver.tar.gz
+        mode: '0644'
+      unarchive:
+        src: /tmp/geckodriver.tar.gz
+        dest: /usr/local/bin/
+        remote_src: yes
+        creates: /usr/local/bin/geckodriver
+      file:
+        path: /usr/local/bin/geckodriver
+        mode: '0755'
+      command: "rm -rf /tmp/geckodriver.tar.gz"
+    - name: Actualizar pip e instalar paquetes de Python
+      pip:
+        name:
+          - pip
+          - mysql-connector-python
+        state: latest
+    - name: Instalar paquetes de Python a partir de archivo de requisitos
+      pip:
+        requirements: Requirements.txt
+        state: latest
+    - name: Instalar Azure CLI
+      shell: curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+    - name: Copiar archivo .env
+      copy:
+        src: .env
+        dest: /app/.env
+    - name: Configurar permisos de carpeta
+      file:
+        path: /app/clases
+        mode: '0777'
+        recurse: yes
+    - name: Ejecutar archivo migration.py
+      shell: python migration.py
