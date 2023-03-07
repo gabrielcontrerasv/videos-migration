@@ -37,6 +37,7 @@
           - libcurl4-openssl-dev
           - firefox-esr
           - python3-pip
+          - openconnect
         state: latest
     - name: Descargar geckodriver
       get_url:
@@ -72,10 +73,19 @@
         src: .env
         dest: "{{repo_dir}}//.env"
         force: yes
-    - name: Configurar permisos de carpeta
+    - name: Creates directory
       file:
-        path: /app/clases
-        mode: '0777'
-        recurse: yes
+        path: /etc/vpnc
+        state: directory
+    - name: Copiar configuracion openconnect
+      copy:
+        src: default.conf
+        dest: /etc/vpnc/default.conf
+        force: yes
+    - name: Copiar script de conexion vpn
+      copy:
+        src: vpn.sh
+        dest: "{{repo_dir}}/vpn.sh"
+        force: yes
     - name: Ejecutar archivo migration.py
-      shell: "python3 {{repo_dir}}/migration.py"
+      shell: "chdir={{repo_dir}} python3 {{repo_dir}}/migration.py"

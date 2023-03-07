@@ -10,6 +10,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from database import updateLinks
 
+#conectar a la vpn
+cmd = "./vpn.sh"
+os.system(cmd)
+
 # Carga las variables de entorno desde el archivo .env
 load_dotenv()
 
