@@ -2,23 +2,29 @@
 - hosts: all
   become: true
   vars:
-    workspace_dir: /home/Innova/Desktop/migration
+    repo_dir: /home/vagrant/repo
+    workspace_dir: /home/vagrant
+    geckodriver_version: "{{ lookup('url', 'https://api.github.com/repos/mozilla/geckodriver/releases/latest') | from_json | json_query('tag_name') }}"
 
-- name: Clonar repositorio
-  git:
-    repo: https://github.com/gabrielcontrerasv/MigrationWebex.git
-    dest: /ruta/personalizada/MigrationWebex
-    version: migration
-
-- name: Instalación y configuración de dependencias
-  hosts: all
-  become: true
   tasks:
+    - name: Clonar repositorio
+      git:
+        repo: https://github.com/gabrielcontrerasv/MigrationWebex.git
+        dest: "{{repo_dir}}"
+        version: migration
+    - name: Asignar permisos repo
+      file:
+        path: "{{repo_dir}}"
+        mode: '0755'
+        owner: vagrant
+        recurse: true
+    - name: Descargar repo de firefox
+      command: "sudo add-apt-repository -y ppa:mozillateam/ppa"
     - name: Actualizar el sistema operativo
       apt:
         update_cache: yes
         cache_valid_time: 3600
-        upgrade: yes
+        force_apt_get: true
     - name: Instalar paquetes necesarios
       apt:
         name:
@@ -30,24 +36,26 @@
           - libgconf-2-4
           - libcurl4-openssl-dev
           - firefox-esr
+          - python3-pip
         state: latest
-    - name: Descargar y configurar geckodriver
-      vars:
-        geckodriver_version: "{{ lookup('url', 'https://api.github.com/repos/mozilla/geckodriver/releases/latest') | from_json | json_query('tag_name') }}"
+    - name: Descargar geckodriver
       get_url:
         url: "https://github.com/mozilla/geckodriver/releases/download/{{ geckodriver_version }}/geckodriver-{{ geckodriver_version }}-linux64.tar.gz"
         dest: /tmp/geckodriver.tar.gz
-        mode: '0644'
+        mode: 0644
+    - name: Descomprimir geckodriver
       unarchive:
         src: /tmp/geckodriver.tar.gz
         dest: /usr/local/bin/
         remote_src: yes
         creates: /usr/local/bin/geckodriver
+    - name: Asignar permisos geckodriver
       file:
         path: /usr/local/bin/geckodriver
         mode: '0755'
+    - name: Eliminar carpeta de descarga de geckodriver
       command: "rm -rf /tmp/geckodriver.tar.gz"
-    - name: Actualizar pip e instalar paquetes de Python
+    - name: Actualizar pip e instalar paquetes de Python 
       pip:
         name:
           - pip
@@ -55,18 +63,19 @@
         state: latest
     - name: Instalar paquetes de Python a partir de archivo de requisitos
       pip:
-        requirements: Requirements.txt
+        requirements: "{{repo_dir}}/Requirements.txt"
         state: latest
     - name: Instalar Azure CLI
       shell: curl -sL https://aka.ms/InstallAzureCLIDeb | bash
     - name: Copiar archivo .env
       copy:
         src: .env
-        dest: /app/.env
+        dest: "{{repo_dir}}//.env"
+        force: yes
     - name: Configurar permisos de carpeta
       file:
         path: /app/clases
         mode: '0777'
         recurse: yes
     - name: Ejecutar archivo migration.py
-      shell: python migration.py
+      shell: "python3 {{repo_dir}}/migration.py"

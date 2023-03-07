@@ -1,0 +1,7 @@
+vb_name: webex    
+vb_memory: 2024
+vb_cpus: 2
+vb_user: vagrant
+public_ip: "192.168.20.70"
+public_bridge: wlp4s0
+vm_hostname: "webex.local"
