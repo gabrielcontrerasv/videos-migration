@@ -11,8 +11,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from database import updateLinks
 
 #conectar a la vpn
-cmd = "./vpn.sh"
-os.system(cmd)
+#cmd = "./vpn.sh"
+#os.system(cmd)
 
 # Carga las variables de entorno desde el archivo .env
 load_dotenv()
@@ -30,7 +30,7 @@ df = pd.read_excel(clases)
 
 # Configuramos las opciones de Firefox para descargar los archivos automáticamente en modo headless
 options = Options()
-options.binary_location = r'/usr/bin/firefox-esr'
+#options.binary_location = r'/usr/bin/firefox-esr'
 options.add_argument('-headless')
 prefs = {'download.default_directory': download_path}
 options.set_preference('browser.download.folderList', 2)
@@ -92,6 +92,6 @@ excel_file = 'resultado.xlsx'
 df.to_excel(excel_file, index=False)
 # Cerramos el navegador
 driver.quit()
-print('actualizando base de datos')
+print('actualizando base de datos espere porfavor...')
 updateLinks(df)
 print('registros actualizados correctamente')

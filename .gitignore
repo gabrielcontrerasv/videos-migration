@@ -4,3 +4,5 @@
 geckodriver.log
 .vagrant/
 inventory.ini
+.vscode
+testv2.xlsx
