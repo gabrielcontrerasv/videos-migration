@@ -9,7 +9,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from database import updateLinks
+import log
 
+logger = log.getLog()
 #conectar a la vpn
 #cmd = "./vpn.sh"
 #os.system(cmd)
@@ -56,6 +58,7 @@ for url in df['Mgmeet record']:
         # Hacemos clic en el botón de descarga
         download_button = WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.recordingHeader i')))
         print('descargando porfavor espere...')
+        logger.info(f"Descargando video de la URL: {url}")
         download_button.click()
         time.sleep(2)
 
@@ -66,6 +69,7 @@ for url in df['Mgmeet record']:
             print('Esperando a que se descargue el archivo...')
         print('subiendo a azureBlob...')
         # Subimos el archivo descargado a Azure Blob Storage
+        logger.info(f"Subiendo video de la URL: {url} a azureBlob")
         for file in os.listdir(download_path):
                 blob_url = f"https://{os.getenv('AZURE_STORAGE_ACCOUNT')}.blob.core.windows.net/{container_name}/{file}"
                 blob_urls.append(blob_url)
@@ -80,9 +84,13 @@ for url in df['Mgmeet record']:
                 '''
                 os.system(cmd)
                 print("ya termine ...")
+                logger.info(f"Finalizacion de subida del video de la URL: {url} a azureBlob")
+                logger.info(f"Eliminando video de la URL: {url}")
                 os.remove(os.path.join(download_path, file))
+                logger.info(f"Video eliminado de la URL: {url}")
     except Exception as e:
         print(f"Ocurrió un error en la descarga de la URL {url}: {str(e)}")
+        logger.error(f"Ocurrió un error en la descarga de la URL {url}: {str(e)}")
         blob_urls.append('')
         continue
 df = df.assign(new_url=blob_urls)

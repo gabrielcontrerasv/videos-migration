@@ -6,3 +6,5 @@ geckodriver.log
 inventory.ini
 .vscode
 testv2.xlsx
+logs/*.log
+__pycache__

@@ -1,0 +1,22 @@
+2023-03-09 05:57:14,754 - webex_videos - INFO - Descargando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=ca7c616fa8a60ac9d71dbc710d76906c
+2023-03-09 05:57:56,930 - webex_videos - INFO - Subiendo video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=ca7c616fa8a60ac9d71dbc710d76906c a azureBlob
+2023-03-09 05:57:56,930 - webex_videos - INFO - Finalizacion de subida del video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=ca7c616fa8a60ac9d71dbc710d76906c a azureBlob
+2023-03-09 05:57:56,930 - webex_videos - INFO - Eliminando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=ca7c616fa8a60ac9d71dbc710d76906c
+2023-03-09 05:57:57,245 - webex_videos - INFO - Video eliminado de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=ca7c616fa8a60ac9d71dbc710d76906c
+2023-03-09 05:58:06,179 - webex_videos - ERROR - Ocurrió un error en la descarga de la URL https://comfama.webex.com/comfama/ldr.php?RCID=24172b94001615a9f9924cc1be32e5eddd: Message: 
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:180:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:392:5
+element.find/</<@chrome://remote/content/marionette/element.sys.mjs:133:16
+
+2023-03-09 05:58:08,397 - webex_videos - INFO - Descargando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=ca7c616fa8a60ac9d71dbc710d76906c
+2023-03-09 05:58:47,759 - webex_videos - INFO - Subiendo video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=ca7c616fa8a60ac9d71dbc710d76906c a azureBlob
+2023-03-09 05:58:47,760 - webex_videos - INFO - Finalizacion de subida del video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=ca7c616fa8a60ac9d71dbc710d76906c a azureBlob
+2023-03-09 05:58:47,760 - webex_videos - INFO - Eliminando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=ca7c616fa8a60ac9d71dbc710d76906c
+2023-03-09 05:58:47,982 - webex_videos - INFO - Video eliminado de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=ca7c616fa8a60ac9d71dbc710d76906c
+2023-03-09 05:58:50,580 - webex_videos - INFO - Descargando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=89c0e2e34c9e0ecbbbb3051d1027ddfc
+2023-03-09 05:58:57,618 - webex_videos - INFO - Subiendo video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=89c0e2e34c9e0ecbbbb3051d1027ddfc a azureBlob
+2023-03-09 05:58:57,618 - webex_videos - INFO - Finalizacion de subida del video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=89c0e2e34c9e0ecbbbb3051d1027ddfc a azureBlob
+2023-03-09 05:58:57,618 - webex_videos - INFO - Eliminando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=89c0e2e34c9e0ecbbbb3051d1027ddfc
+2023-03-09 05:58:57,622 - webex_videos - INFO - Video eliminado de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=89c0e2e34c9e0ecbbbb3051d1027ddfc
