@@ -10,6 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from database import updateLinks
 import log
+import datetime
 
 logger = log.getLog()
 #conectar a la vpn
@@ -32,7 +33,7 @@ df = pd.read_excel(clases)
 
 # Configuramos las opciones de Firefox para descargar los archivos automáticamente en modo headless
 options = Options()
-#options.binary_location = r'/usr/bin/firefox-esr'
+options.binary_location = r'/usr/bin/firefox-esr'
 options.add_argument('-headless')
 prefs = {'download.default_directory': download_path}
 options.set_preference('browser.download.folderList', 2)
@@ -91,6 +92,9 @@ for url in df['Mgmeet record']:
     except Exception as e:
         print(f"Ocurrió un error en la descarga de la URL {url}: {str(e)}")
         logger.error(f"Ocurrió un error en la descarga de la URL {url}: {str(e)}")
+        now = datetime.datetime.now()
+        date_string = now.strftime('%Y-%m-%d_%H-%M-%S')
+        driver.save_screenshot(f'screenshots/screenshots_{date_string}.png')
         blob_urls.append('')
         continue
 df = df.assign(new_url=blob_urls)

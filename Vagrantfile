@@ -82,6 +82,7 @@ Vagrant.configure("2") do |config|
     #comfama.vm.network :"public_network", ip: settings['public_ip']
 
     #config.vm.synced_folder '.', '/vagrant', disabled: true
+    config.vm.synced_folder "./", "/home/vagrant/repo", owner: "vagrant", group: "vagrant", type: "virtualbox"
 
     #comfama.vm.provision :ansible do |ansible|
     #  ansible.compatibility_mode = "2.0"

@@ -8,3 +8,6 @@ inventory.ini
 testv2.xlsx
 logs/*.log
 __pycache__
+
+screenshots/**
+!screenshots/example.png
