@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo openconnect --config /etc/vpnc/default.conf --non-inter  urlVpnComfama --passwd-on-stdin <<< ingresarPassword &

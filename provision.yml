@@ -38,6 +38,7 @@
           - firefox-esr
           - python3-pip
           - openconnect
+          - libavcodec-extra
         state: latest
     - name: Descargar geckodriver
       get_url:

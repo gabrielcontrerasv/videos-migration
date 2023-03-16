@@ -9,5 +9,8 @@ testv2.xlsx
 logs/*.log
 __pycache__
 
+vpn.sh
+default.conf
+
 screenshots/**
 !screenshots/example.png
