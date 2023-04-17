@@ -17,21 +17,12 @@ logger = log.getLog()
 #cmd = "./vpn.sh"
 #os.system(cmd)
 
-# Carga las variables de entorno desde el archivo .env
 load_dotenv()
-
-# Accede a la variable de entorno CLASES_FILE
 clases = os.getenv('CLASES_FILE')
 sas = os.getenv('SAS')
 account = os.getenv('AZURE_STORAGE_ACCOUNT')
-
-# Obtenemos la ruta del directorio actual y concatenamos /clases
 download_path = os.path.join(os.getcwd(), 'clases')
-
-# Cargamos el archivo de Excel que contiene las URLs de los videos
 df = pd.read_excel(clases)
-
-# Configuramos las opciones de Firefox para descargar los archivos automáticamente en modo headless
 options = Options()
 options.binary_location = r'/usr/bin/firefox-esr'
 options.add_argument('-headless')
@@ -41,35 +32,25 @@ options.set_preference('browser.download.manager.showWhenStarting', False)
 options.set_preference('browser.download.dir', download_path)
 options.set_preference('browser.helperApps.neverAsk.saveToDisk', 'video/mp4')
 
-# Inicializamos el driver de Firefox
 driver = webdriver.Firefox(options=options)
-
-# Creamos una instancia del cliente de Azure Blob Storage
 blob_service_client = BlobServiceClient.from_connection_string(os.getenv('AZURE_STORAGE_CONNECTION_STRING'))
-
-# Definimos el nombre del contenedor de Blob Storage donde queremos almacenar los archivos
 container_name = os.getenv('AZURE_STORAGE_CONTAINER_NAME')
 blob_urls = []
-# Iteramos sobre cada URL en el archivo de Excel
 for url in df['Mgmeet record']:
     try:
-        # Abrimos la URL en el navegador
         driver.get(url)
         time.sleep(2)
-        # Hacemos clic en el botón de descarga
         download_button = WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.recordingHeader i')))
         print('descargando porfavor espere...')
         logger.info(f"Descargando video de la URL: {url}")
         download_button.click()
         time.sleep(2)
 
-        # Esperamos a que se descargue el archivo antes de continuar
         while True:
             if all(file.endswith('.mp4') for file in os.listdir(download_path)):
                 break
             print('Esperando a que se descargue el archivo...')
         print('subiendo a azureBlob...')
-        # Subimos el archivo descargado a Azure Blob Storage
         logger.info(f"Subiendo video de la URL: {url} a azureBlob")
         for file in os.listdir(download_path):
                 blob_url = f"https://{os.getenv('AZURE_STORAGE_ACCOUNT')}.blob.core.windows.net/{container_name}/{file}"
@@ -98,11 +79,8 @@ for url in df['Mgmeet record']:
         blob_urls.append('')
         continue
 df = df.assign(new_url=blob_urls)
-# Nombre del archivo de Excel
 excel_file = 'resultado.xlsx'
-# Guardamos el DataFrame en el archivo de Excel
 df.to_excel(excel_file, index=False)
-# Cerramos el navegador
 driver.quit()
 print('actualizando base de datos espere porfavor...')
 updateLinks(df)
