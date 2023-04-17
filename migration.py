@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from database import updateLinks
+from database import connectToDatabase,getLinksToDownload,updateLinks
 import log
 import datetime
 
@@ -17,12 +17,13 @@ logger = log.getLog()
 #cmd = "./vpn.sh"
 #os.system(cmd)
 
+
 load_dotenv()
-clases = os.getenv('CLASES_FILE')
+clases = getLinksToDownload()
 sas = os.getenv('SAS')
 account = os.getenv('AZURE_STORAGE_ACCOUNT')
 download_path = os.path.join(os.getcwd(), 'clases')
-df = pd.read_excel(clases)
+
 options = Options()
 options.binary_location = r'/usr/bin/firefox-esr'
 options.add_argument('-headless')
@@ -36,7 +37,7 @@ driver = webdriver.Firefox(options=options)
 blob_service_client = BlobServiceClient.from_connection_string(os.getenv('AZURE_STORAGE_CONNECTION_STRING'))
 container_name = os.getenv('AZURE_STORAGE_CONTAINER_NAME')
 blob_urls = []
-for url in df['Mgmeet record']:
+for url in clases['Mgmeet record']:
     try:
         driver.get(url)
         time.sleep(2)
@@ -78,10 +79,7 @@ for url in df['Mgmeet record']:
         driver.save_screenshot(f'screenshots/screenshots_{date_string}.png')
         blob_urls.append('')
         continue
-df = df.assign(new_url=blob_urls)
-excel_file = 'resultado.xlsx'
-df.to_excel(excel_file, index=False)
+results = clases.assign(new_url=blob_urls)
+results.to_excel('resultado.xlsx', index=False)
 driver.quit()
-print('actualizando base de datos espere porfavor...')
-updateLinks(df)
-print('registros actualizados correctamente')
+updateLinks(results)
