@@ -1,0 +1,16 @@
+2023-03-09 11:31:39,696 - webex_videos - INFO - Descargando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=87dea106e34dcdb4c12b284889f1e355
+2023-03-09 11:31:46,041 - webex_videos - INFO - Subiendo video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=87dea106e34dcdb4c12b284889f1e355 a azureBlob
+2023-03-09 11:32:35,069 - webex_videos - INFO - Finalizacion de subida del video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=87dea106e34dcdb4c12b284889f1e355 a azureBlob
+2023-03-09 11:32:35,069 - webex_videos - INFO - Eliminando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=87dea106e34dcdb4c12b284889f1e355
+2023-03-09 11:32:35,077 - webex_videos - INFO - Video eliminado de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=87dea106e34dcdb4c12b284889f1e355
+2023-03-09 11:32:37,614 - webex_videos - INFO - Descargando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=846e27281c5003d17be1f59f0fb2e722
+2023-03-09 11:32:47,429 - webex_videos - INFO - Subiendo video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=846e27281c5003d17be1f59f0fb2e722 a azureBlob
+2023-03-09 11:34:26,040 - webex_videos - INFO - Finalizacion de subida del video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=846e27281c5003d17be1f59f0fb2e722 a azureBlob
+2023-03-09 11:34:26,040 - webex_videos - INFO - Eliminando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=846e27281c5003d17be1f59f0fb2e722
+2023-03-09 11:34:26,054 - webex_videos - INFO - Video eliminado de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=846e27281c5003d17be1f59f0fb2e722
+2023-03-09 11:34:28,592 - webex_videos - INFO - Descargando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=6249fa82bec347bdd3f18099f82f730b
+2023-03-09 11:34:37,454 - webex_videos - INFO - Subiendo video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=6249fa82bec347bdd3f18099f82f730b a azureBlob
+2023-03-09 11:36:28,401 - webex_videos - INFO - Finalizacion de subida del video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=6249fa82bec347bdd3f18099f82f730b a azureBlob
+2023-03-09 11:36:28,401 - webex_videos - INFO - Eliminando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=6249fa82bec347bdd3f18099f82f730b
+2023-03-09 11:36:28,413 - webex_videos - INFO - Video eliminado de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=6249fa82bec347bdd3f18099f82f730b
+2023-03-09 11:36:30,954 - webex_videos - INFO - Descargando video de la URL: https://comfama.webex.com/comfama/ldr.php?RCID=f45c122987efa824df46eb1e4d61f31e
