@@ -1,3 +1,13 @@
 .env
 /clases
+.DS_Store
+geckodriver.log
+.vagrant/
+inventory.ini
+.vscode
+logs/*.log
+__pycache__
+
+screenshots/**
+!screenshots/example.png
 web/clases
