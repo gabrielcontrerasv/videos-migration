@@ -13,10 +13,6 @@ import log
 import datetime
 
 logger = log.getLog()
-#conectar a la vpn
-#cmd = "./vpn.sh"
-#os.system(cmd)
-
 
 load_dotenv()
 clases = getLinksToDownload()
@@ -26,6 +22,12 @@ download_path = os.path.join(os.getcwd(), 'clases')
 
 options = Options()
 options.binary_location = r'/usr/bin/firefox-esr'
+load_dotenv()
+clases = os.getenv('CLASES_FILE')
+download_path = os.path.join(os.getcwd(), 'clases')
+df = pd.read_excel(clases)
+
+options = Options()
 options.add_argument('-headless')
 prefs = {'download.default_directory': download_path}
 options.set_preference('browser.download.folderList', 2)
@@ -83,3 +85,29 @@ results = clases.assign(new_url=blob_urls)
 results.to_excel('resultado.xlsx', index=False)
 driver.quit()
 updateLinks(results)
+driver = webdriver.Firefox(options=options)
+blob_service_client = BlobServiceClient.from_connection_string(os.getenv('AZURE_STORAGE_CONNECTION_STRING'))
+container_name = os.getenv('AZURE_STORAGE_CONTAINER_NAME')
+for url in df['Mgmeet record']:
+    driver.get(url)
+    time.sleep(2)
+    download_button = WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'i.recordingDownload[title="Descargar"]')))
+    print('descargando porfavor espere...')
+    download_button.click()
+
+    time.sleep(2)
+    while True:
+        if all(file.endswith('.mp4') for file in os.listdir(download_path)):
+            break
+        time.sleep(1)
+        print('Esperando a que se descargue el archivo...')
+    print('subiendo a azureBlob...')
+    for file in os.listdir(download_path):
+        if file.endswith('.mp4'):
+            blob_client = blob_service_client.get_blob_client(container=container_name, blob=file)
+            with open(os.path.join(download_path, file), "rb") as data:
+                print("ya estoy enviando paquetes")
+                blob_client.upload_blob(data, overwrite=True)
+                print("ya termine, eliminando...")
+            os.remove(os.path.join(download_path, file))
+driver.quit()
