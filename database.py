@@ -1,76 +1,47 @@
 import pandas as pd
-import os
-from dotenv import load_dotenv
-import mysql.connector
 from sshtunnel import SSHTunnelForwarder
+import os
+import paramiko
+import pandas as pd
+from dotenv import load_dotenv
 
 load_dotenv()
 
-def connectToDatabase():
-    tunnel = SSHTunnelForwarder(
-        (os.getenv('SSH_HOST'), int(os.getenv('SSH_PORT'))),
-        ssh_username=os.getenv('SSH_USER'),
-        ssh_password=os.getenv('SSH_PASSWORD'),
-        remote_bind_address=(os.getenv('REMOTE_HOST'), int(os.getenv('REMOTE_PORT'))),
-        local_bind_address=(os.getenv('LOCAL_HOST'), int(os.getenv('LOCAL_PORT')))
-    )
-    tunnel.start()
+def get_links():
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(hostname=os.getenv('SSH_HOST'),
+                username=os.getenv('SSH_USER'),
+                password=os.getenv('SSH_PASSWORD'))
 
-    db = mysql.connector.connect(
-        user=os.getenv('DATABASE_USER'),
-        password=os.getenv('DATABASE_PASSWORD'),
-        host=os.getenv('DATABASE_HOST'),
-        port=tunnel.local_bind_port,
-        database=os.getenv('DATABASE_NAME')
-    )
+    comando_mysql = "mysql -u " + os.getenv('DATABASE_USER') + " -p" + os.getenv('DATABASE_PASSWORD') + " -h " + os.getenv('DATABASE_HOST') + " -D " + os.getenv('DATABASE_NAME') + " -e \"SELECT mme.record FROM mdl_managemeet_event mme JOIN mdl_managemeet mm ON mm.id =mme.managemeetid JOIN mdl_course mc ON mc.id =mm.course JOIN mdl_course_categories AS cc ON mc.category = cc.id WHERE mme.record like '%https://comfama.webex.com%' and mme.timecreated >= 1672549200 AND cc.id in (216) AND mme.new_url Is null;\""
+    stdin, stdout, stderr = ssh.exec_command(comando_mysql)
+    result = stdout.read().decode('utf-8')
 
-    return db, tunnel
+    ssh.close() 
+    return convert_to_dataframe(result)
 
-def getLinksToDownload():
-    db, tunnel = connectToDatabase()
-    cursor = db.cursor()
+def convert_to_dataframe(result):
+    resultados = result.strip().split("\n")[1:]
+    filas = [fila.split("\t") for fila in resultados]
+    return pd.DataFrame(filas, columns=["record"])
 
-    sql = """SELECT  mme.id, mme.managemeetid, mm.course, cc.id,cc.name, mc.shortname, mc.fullname,   mme.name, mme.intro, mme.time, mme.timehasta,
-        DATE_FORMAT(FROM_UNIXTIME(mme.time),'%%Y-%%m-%%d %%H:%%i:%%S') AS 'fechainicio',
-        DATE_FORMAT(FROM_UNIXTIME(mme.timehasta),'%%Y-%%m-%%d %%H:%%i:%%S') AS 'fechafin',
-        mme.webinar, mme.record, mme.new_url,
-        DATE_FORMAT(FROM_UNIXTIME(mme.timecreated),'%%Y-%%m-%%d %%H:%%i:%%S') AS 'fechacread'
-        FROM mdl_managemeet_event mme
-        JOIN mdl_managemeet mm ON mm.id =mme.managemeetid
-        JOIN mdl_course mc ON mc.id =mm.course
-        JOIN mdl_course_categories AS cc ON mc.category = cc.id
-        WHERE mme.record like '%%https://comfama.webex.com%%'
-        and mme.timecreated >= 1672549200
-        AND cc.id in (216)"""
+def update_links(result):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(hostname=os.getenv('SSH_HOST'),
+                username=os.getenv('SSH_USER'),
+                password=os.getenv('SSH_PASSWORD'))
 
-    try:
-        cursor.execute(sql)
-        return cursor.fetchall()
-    except mysql.connector.Error as err:
-        print('Error en la consulta: {}'.format(err))
-        return None
-    finally:
-        db.close()
-        tunnel.stop()
+    comando_mysql = "mysql -u " + os.getenv('DATABASE_USER') + " -p" + os.getenv('DATABASE_PASSWORD') + " -h " + os.getenv('DATABASE_HOST') + " -D " + os.getenv('DATABASE_NAME') + " -e \""
+    for index, row in result.iterrows():
+        mgmeet_record = row['record']
+        new_url = row['new_url']
 
-def updateLinks(result):
-    db, tunnel = connectToDatabase()
-    cursor = db.cursor()
+        sql = "UPDATE mdl_managemeet_event SET new_url = '" + new_url + "' WHERE record = '" + mgmeet_record + "';"
+        comando_mysql += sql
 
-    for row in result:
-        mgmeet_record = row[15]
-        new_url = row[14]
+    stdin, stdout, stderr = ssh.exec_command(comando_mysql)
+    print(stdout.read().decode('utf-8'))
 
-        sql = "UPDATE mdl_managemeet_event SET new_url = %s WHERE record = %s"
-        val = (new_url, mgmeet_record)
-
-        try:
-            cursor.execute(sql, val)
-            print('se actualizó ' + new_url)
-        except mysql.connector.Error as err:
-            print('No se encontró en la base de datos: {}'.format(err))
-        finally:
-            db.commit()
-
-    db.close()
-    tunnel.stop()
+    ssh.close()
