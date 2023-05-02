@@ -8,18 +8,17 @@ from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from database import connectToDatabase,getLinksToDownload,updateLinks
+from database import get_links, update_links
 import log
 import datetime
 
 logger = log.getLog()
-#conectar a la vpn
-#cmd = "./vpn.sh"
-#os.system(cmd)
-
+cmd = "./vpn.sh"
+os.system(cmd)
 
 load_dotenv()
-clases = getLinksToDownload()
+clases = get_links()
+print(clases)
 sas = os.getenv('SAS')
 account = os.getenv('AZURE_STORAGE_ACCOUNT')
 download_path = os.path.join(os.getcwd(), 'clases')
@@ -37,7 +36,7 @@ driver = webdriver.Firefox(options=options)
 blob_service_client = BlobServiceClient.from_connection_string(os.getenv('AZURE_STORAGE_CONNECTION_STRING'))
 container_name = os.getenv('AZURE_STORAGE_CONTAINER_NAME')
 blob_urls = []
-for url in clases['Mgmeet record']:
+for url in clases['record']:
     try:
         driver.get(url)
         time.sleep(2)
@@ -82,4 +81,4 @@ for url in clases['Mgmeet record']:
 results = clases.assign(new_url=blob_urls)
 results.to_excel('resultado.xlsx', index=False)
 driver.quit()
-updateLinks(results)
+update_links(results)

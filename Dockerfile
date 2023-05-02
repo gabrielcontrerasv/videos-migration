@@ -13,7 +13,6 @@ RUN apt-get update \
     && mv geckodriver /usr/local/bin/geckodriver \
     && chmod +x /usr/local/bin/geckodriver \
     && pip install --upgrade pip \
-    && pip install mysql-connector-python \
     && pip install --no-cache-dir -r Requirements.txt 
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 COPY .env /app/.env

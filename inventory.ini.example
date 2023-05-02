@@ -1,2 +1,0 @@
-[servers]
-192.168.20.70 ansible_user=vagrant ansible_password=vagrant ansible_become_pass=vagrant
