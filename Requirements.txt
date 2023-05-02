@@ -1,7 +1,7 @@
+mysql-connector
 python-dotenv
 openpyxl
 pandas
 requests
 selenium
-azure.storage.blob 
-paramiko
+azure.storage.blob
