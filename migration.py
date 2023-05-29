@@ -13,8 +13,8 @@ import log
 import datetime
 
 logger = log.getLog()
-cmd = "./vpn.sh"
-os.system(cmd)
+#cmd = "./vpn.sh"
+#os.system(cmd)
 
 load_dotenv()
 clases = get_links()
@@ -24,7 +24,7 @@ account = os.getenv('AZURE_STORAGE_ACCOUNT')
 download_path = os.path.join(os.getcwd(), 'clases')
 
 options = Options()
-options.binary_location = r'/usr/bin/firefox-esr'
+#options.binary_location = r'/usr/bin/firefox-esr'
 options.add_argument('-headless')
 prefs = {'download.default_directory': download_path}
 options.set_preference('browser.download.folderList', 2)
@@ -81,4 +81,5 @@ for url in clases['record']:
 results = clases.assign(new_url=blob_urls)
 results.to_excel('resultado.xlsx', index=False)
 driver.quit()
+print('actualizando base de datos...')
 update_links(results)
